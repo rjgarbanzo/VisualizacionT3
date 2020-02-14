@@ -1,0 +1,68 @@
+---
+title: "Tarea3_Ricardo_Garbanzo"
+author: "Ricardo Garbanzo"
+date: "13/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Utilizando el archivo 2019-ncov-confirmed.csv con informacion de los casos confirmados de la sepa de coronavirus 2019-nCoV la cual contiene las siguiente variables: region : indica si el infectado se encuentra en China o en otra region. date : fecha de la observacion. value: cantidad de casos confirmados. Realice lo siguiente:
+
+### A) Lea los datos utilizando la siguiente instruccion (verifique que tenga instalado el paquete lubridate)
+
+```{r Ejercicio 1 - A}
+library(lubridate)
+datos <- read.csv("2019-ncov-confirmed.csv", header = T)
+datos$fecha <- lubridate::ymd_hms(datos$fecha)
+```
+
+
+
+### B) Utilizando el paquete ggplot2 realice un grafico de lineas que represente la cantidad de casos conformados diferenciando entre los casos reportados en China y los casos reportados en otras regiones, agregue los titulos y legendas requeridas y coloque como fuente de los datos a la Universidad Johns Hopkins.
+
+```{r Ejercicio 1 - B}
+library(ggplot2)
+library(scales)
+ggplot(datos, aes(x=fecha, y=infectados, colour = pais )) + 
+  geom_line()  + 
+  geom_point( size=2, shape=21, fill="white") + 
+  theme_minimal()+
+  labs(title = "Cantidad de personas infectadas por coronavirus ",
+       x = "Fecha de la observación",
+       y = "Cantidad de casos confirmados",
+       caption = "Fuente: Universidad Johns Hopkins")
+```
+
+
+
+### C) Utilizando el paquete apexcharter repite el grafico del punto anterior.
+
+```{r Ejercicio 1 - C}
+library(apexcharter)
+
+apex(data = datos,
+     type = "line",
+     mapping = aes(x = fecha, 
+                   y = infectados, fill = pais)) %>% 
+  ax_title(text = "Cantidad de personas infectadas por coronavirus ",
+           style = list(fontSize = 20),
+           align = "center") %>%
+ax_labs(       x = "Fecha de la observación",
+       y = "Cantidad de casos confirmados",
+       caption = "Fuente: Universidad Johns Hopkins")
+```
+
+
+
+## 2. Utilizando los datos de la tabla 2019-ncov-total.csv realice lo siguiente:
+
+### a) Instale los paquetes rnaturalearth y rnaturalearthdata, estos le permitiran cargar los datos para realizar un grafico del mundo.
+
+### b) Cargue el los datos de todos los paises utilizando la siguiente instruccion. world <- ne_ countries ( scale = " small ", returnclass = "sf")
+
+### c) Agregue a la tabla world una variable que le permita saber cuales paises tienen o no casos confirmados de 2019-nCoV.
+
+### d) Utilizando los paquetes sf, ggforce y ggplot2 replique el siguiente grafico.
