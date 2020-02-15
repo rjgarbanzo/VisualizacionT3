@@ -51,8 +51,7 @@ apex(data = datos,
            style = list(fontSize = 20),
            align = "center") %>%
 ax_labs(       x = "Fecha de la observación",
-       y = "Cantidad de casos confirmados",
-       caption = "Fuente: Universidad Johns Hopkins")
+       y = "Cantidad de casos confirmados")
 ```
 
 
@@ -66,3 +65,41 @@ ax_labs(       x = "Fecha de la observación",
 ### c) Agregue a la tabla world una variable que le permita saber cuales paises tienen o no casos confirmados de 2019-nCoV.
 
 ### d) Utilizando los paquetes sf, ggforce y ggplot2 replique el siguiente grafico.
+
+```{r Ejercicio 2}
+library(tidyverse)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(ggforce)
+library(ggplot2)
+world <- ne_countries(scale = "small", returnclass = "sf")
+datos <- read.csv("2019-ncov-total.csv", header = T)
+
+
+world_infectados <- left_join(x = world,
+                              y = datos,
+                              by = c("admin" = "region"))
+
+
+ggplot(data = world)+
+  geom_sf(color="white", fill= case_when(world_infectados$value >= 1 ~"#d90000", TRUE ~"#a6a6a6"))+
+  theme_classic()+
+  geom_mark_circle(data=datos,
+                   mapping=aes(x=datos$Long,
+                               y=datos$Lat,
+                               group=datos$region,
+                               label=datos$region),
+                   expand = unit(2,"mm"),
+                   label.fontsize = 6)
+```
+
+
+
+
+
+## 3. Utilizando el conjunto de datos "2019-ncov-totals-coords.csv" y el paquete leaflet genere un mapa interactivo que cumpla con los siguientes requisitos:
+
+### a) Se debe colocar un marcador en cada uno de los paises que han reportado casos de 2019-nCoV.
+
+### b) Al dar clic sobre un marcador se debe desplegar un mensaje que nos indique la ciudad y la cantidad de casos reportados.
