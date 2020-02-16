@@ -58,3 +58,56 @@ ggplot(data = world)+
                    label.fontsize = 12)
 
 
+######################################################################################
+
+## 3. Utilizando el conjunto de datos "2019-ncov-totals-coords.csv" y 
+#el paquete leaflet genere un mapa interactivo que cumpla con los siguientes requisitos:
+
+## a) Se debe colocar un marcador en cada uno de los paises que han reportado casos de 2019-nCoV.
+
+## b) Al dar clic sobre un marcador se debe desplegar un mensaje que nos indique la ciudad y 
+#la cantidad de casos reportados.
+
+library(tidyverse)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(ggforce)
+library(ggplot2)
+library(leaflet)
+library(htmltools)
+library(stringr)
+library(scales)
+library(purrr)
+
+
+world <- ne_countries(scale = "small", returnclass = "sf")
+datos <- read.csv("2019-ncov-totals-coords.csv", header = T)
+
+
+world_infectados_interactivo <- right_join(x = world,y = datos, by = c("admin" = "region"))
+
+pal <- colorBin("Reds", domain = world_infectados_interactivo$pop_est)
+
+etiquetas <- map(transpose(world_infectados_interactivo), ~{
+  HTML(
+    str_c("<strong> País: ", .$admin, "</strong>",
+          "<br/>",
+          "Cantidad de infectados: ", comma(.$value))
+  )
+})
+
+
+leaflet(world_infectados_interactivo) %>%
+  addTiles() %>%
+  addPolygons(label = ~etiquetas,
+              fillColor = ~pal(pop_est),
+              fillOpacity = .9,
+              weight = 2.0,
+              color = "black",
+              highlightOptions = highlightOptions(color = "#ff935c",
+                                                  weight = 3,
+                                                  bringToFront = TRUE,
+                                                  opacity = 1))
+
+
